@@ -1,14 +1,47 @@
+"""
+邮箱验证码获取模块。
+
+本模块提供自动从临时邮箱服务获取验证码的功能。
+"""
+
 from DrissionPage.common import Keys
 import time
 import re
 
 
 class EmailVerificationHandler:
+    """
+    邮箱验证码处理器类。
+
+    该类提供与临时邮箱服务(特别是tempmail.plus)交互的方法，
+    用于获取通过邮件发送的验证码。
+
+    属性:
+        browser: 用于网页交互的浏览器实例
+        mail_url (str): 临时邮箱服务的URL地址
+    """
+
     def __init__(self, browser, mail_url="https://tempmail.plus"):
+        """
+        初始化邮箱验证码处理器。
+
+        参数:
+            browser: 用于网页自动化的浏览器实例
+            mail_url (str, 可选): 临时邮箱服务的URL地址，默认为 "https://tempmail.plus"
+        """
         self.browser = browser
         self.mail_url = mail_url
 
     def get_verification_code(self, email):
+        """
+        从临时邮箱获取验证码。
+
+        参数:
+            email (str): 需要检查验证码的邮箱地址
+
+        返回:
+            str|None: 如果找到验证码则返回验证码，否则返回 None
+        """
         username = email.split("@")[0]
         code = None
 
@@ -36,6 +69,13 @@ class EmailVerificationHandler:
         return code
 
     def _input_username(self, tab, username):
+        """
+        在临时邮箱服务中输入用户名。
+
+        参数:
+            tab: 浏览器标签页实例
+            username (str): 要输入的用户名
+        """
         while True:
             if tab.ele("@id=pre_button"):
                 tab.actions.click("@id=pre_button")
@@ -47,6 +87,15 @@ class EmailVerificationHandler:
             time.sleep(1)
 
     def _get_latest_mail_code(self, tab):
+        """
+        获取最新邮件中的验证码。
+
+        参数:
+            tab: 浏览器标签页实例
+
+        返回:
+            str|None: 如果找到验证码则返回验证码，否则返回 None
+        """
         code = None
         while True:
             new_mail = tab.ele("@class=mail")
@@ -72,6 +121,12 @@ class EmailVerificationHandler:
         return code
 
     def _cleanup_mail(self, tab):
+        """
+        清理邮件。
+
+        参数:
+            tab: 浏览器标签页实例
+        """
         if tab.ele("@id=delete_mail"):
             tab.actions.click("@id=delete_mail")
             time.sleep(1)
